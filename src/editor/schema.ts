@@ -294,18 +294,13 @@ export const templateSchema = [
 
 export function sortDataForForm(sort?: SortConfig) {
   if (!sort) return {};
-  const numeric =
-    sort.numeric === true || sort.numeric === "last"
-      ? "last"
-      : sort.numeric === "first"
-        ? "first"
-        : "off";
+  const numeric = sort.numeric;
   return { ...sort, numeric };
 }
 
 export function sortDataFromForm(sort?: SortConfig) {
   if (!sort) return sort;
-  if (sort.numeric === "off" || sort.numeric === false) {
+  if (sort.numeric === false) {
     const { numeric, ...rest } = sort;
     return rest;
   }
@@ -348,7 +343,8 @@ export const sortSchema = (method) => {
           type: "select",
           label: "Numeric sort",
           options: [
-            ["off", "Off"],
+            [false, "Off"],
+            [true, "On, undefined after numbers"],
             ["last", "On, non-numeric last"],
             ["first", "On, non-numeric first"],
           ],
