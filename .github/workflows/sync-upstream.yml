@@ -1,0 +1,31 @@
+name: Sync Upstream (Git Merge)
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Configure Git Author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge upstream master
+        run: |
+          git remote add upstream https://github.com/thomasloven/lovelace-auto-entities.git
+          git fetch upstream master
+          git merge upstream/master -m "chore: sync upstream master"
+          git push origin master
