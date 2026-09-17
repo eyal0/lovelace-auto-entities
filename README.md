@@ -595,7 +595,10 @@ sort:
   - `friendly_name` — sorts by the entity's original Home Assistant friendly name, **unaffected** by any `rename:` configuration.
 - `reverse:` Set to `true` to reverse the order. Default: `false`.
 - `ignore_case:` Set to `true` to make the sort case-insensitive. Default: `false`.
-- `numeric:` Set to `true` to sort by numeric value. Default: `false` except for `last_changed`, `last_updated` and `last_triggered` sorting methods.
+- `numeric:` How to sort by numeric value. Default: `false` except for `last_changed`, `last_updated` and `last_triggered` (those use `true`). Two non-numeric values compare equal, so a later sort level can order them. This composes with `reverse`.
+  - `false` — do not sort numerically
+  - `numeric_first` — sort numerically; non-numeric values (for example `unknown`) are **greater** than numbers, so numbers come first (last when reversed). `true` is treated the same as `numeric_first`
+  - `numeric_last` — sort numerically; numbers are **greater** than non-numeric values, so numbers come last (first when reversed)
 - `ip:` Set to `true` to sort IP addresses group by group (e.g. 192.168.1.2 will be before 192.168.1.100).
 - `attribute:` Attribute to sort by if `method: attribute`. Can be an _object attribute_ as above (e.g. `attribute: rgb_color:2`)
 - `first` and `count` can be used to only display `<count>` entities, starting with the `<first>` (starts with 0).

@@ -1,5 +1,5 @@
 import { getAreas, getConfigEntries, getDevices, getEntities, getFloors, getLabels } from "../helpers";
-import { SPECIAL_TYPES } from "../types";
+import { SPECIAL_TYPES, SortConfig } from "../types";
 
 const ruleKeySelector = {
   type: "select",
@@ -292,6 +292,24 @@ export const templateSchema = [
   },
 ];
 
+export function sortDataForForm(sort?: SortConfig) {
+  const numeric =
+    sort?.numeric === true || sort?.numeric === "numeric_first"
+      ? "numeric_first"
+      : sort?.numeric === "numeric_last"
+        ? "numeric_last"
+        : false;
+  return { ...sort, numeric };
+}
+
+export function sortDataFromForm(sort?: SortConfig) {
+  if (!sort || sort.numeric === false) {
+    const { numeric, ...rest } = sort ?? {};
+    return rest;
+  }
+  return sort;
+}
+
 export const sortSchema = (method) => {
   const schema: any[] = [
     {
@@ -323,7 +341,16 @@ export const sortSchema = (method) => {
       schema: [
         { name: "reverse", type: "boolean", label: "Reverse" },
         { name: "ignore_case", type: "boolean", label: "Ignore case" },
-        { name: "numeric", type: "boolean", label: "Numeric sort" },
+        {
+          name: "numeric",
+          type: "select",
+          label: "Numeric sort",
+          options: [
+            [false, "Off"],
+            ["numeric_first", "On, numbers first"],
+            ["numeric_last", "On, numbers last"],
+          ],
+        },
         { name: "ip", type: "boolean", label: "IP address sort" },
       ],
     },

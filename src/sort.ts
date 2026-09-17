@@ -1,6 +1,10 @@
 import { getAreas, getDevices, getEntities } from "./helpers";
 import { HassObject, HAState, LovelaceRowConfig, SortConfig } from "./types";
 
+function isNumericSort(numeric: SortConfig["numeric"]): boolean {
+  return numeric === true || numeric === "numeric_first" || numeric === "numeric_last";
+}
+
 function compare(_a: any, _b: any, method: SortConfig) {
   // lt = a before b (a < b)
   // gt = a after b (a > b)
@@ -11,18 +15,21 @@ function compare(_a: any, _b: any, method: SortConfig) {
     _b = _b?.toLowerCase?.() ?? _b;
   }
 
-  if (method.numeric) {
-    if (!(isNaN(parseFloat(_a)) && isNaN(parseFloat(_b)))) {
-      _a = isNaN(parseFloat(_a)) ? undefined : parseFloat(_a);
-      _b = isNaN(parseFloat(_b)) ? undefined : parseFloat(_b);
-    }
+  if (isNumericSort(method.numeric)) {
+    _a = isNaN(parseFloat(_a)) ? undefined : parseFloat(_a);
+    _b = isNaN(parseFloat(_b)) ? undefined : parseFloat(_b);
   }
 
   if (_a === undefined && _b === undefined) return 0;
-  if (_a === undefined) return gt;
-  if (_b === undefined) return lt;
+  if (_a === undefined || _b === undefined) {
+    // numeric_last: numbers are greater than non-numeric.
+    // true / numeric_first: non-numeric is greater than numbers.
+    const numericLast = method.numeric === "numeric_last";
+    if (_a === undefined) return numericLast ? lt : gt;
+    return numericLast ? gt : lt;
+  }
 
-  if (method.numeric) {
+  if (isNumericSort(method.numeric)) {
     if (_a === _b) return 0;
     return _a < _b ? lt : gt;
   }
